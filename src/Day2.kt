@@ -1,15 +1,18 @@
 fun main() {
+
+    fun parseMatches(input: List<String>): List<List<Map<String, Int>>> = input.mapIndexed { _, game ->
+        game.substringAfter(": ")
+            .split("; ")
+            .map { round ->
+                round.split(", ")
+                    .associate { colorAndCount ->
+                        colorAndCount.split(" ").let { (count, color) -> color to count.toInt() }
+                    }
+            }
+    }
+
     fun part1(input: List<String>): Int {
-        val matchs = input.mapIndexed { _, game ->
-            game.substringAfter(": ")
-                .split("; ")
-                .map { round ->
-                    round.split(", ")
-                        .associate { colorAndCount ->
-                            colorAndCount.split(" ").let { (count, color) -> color to count.toInt() }
-                        }
-                }
-        }
+        val matchs = parseMatches(input)
         return matchs
             .withIndex()
             .filter { (_, rounds) ->
@@ -22,7 +25,20 @@ fun main() {
     }
     
     fun part2(input: List<String>): Int {
-        return input.size
+        val matches = parseMatches(input)
+        return matches.map { match ->
+            match.asSequence()
+                    .flatMap {
+                        it.asSequence()
+                    }.groupBy({ it.key }, { it.value })
+
+        }.map { it.values.toTypedArray().map { it.max() } }.sumOf {
+            var power = 1
+            it.map {
+                power *= it
+            }
+            power
+        }
     }
     
     val testInput = readInput("Day02_input")
