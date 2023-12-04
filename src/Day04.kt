@@ -12,7 +12,8 @@ fun main() {
     
     fun part1(input: List<String>): Int {
        return input
-           .map { it.substringAfter(": ")}
+               .asSequence()
+               .map { it.substringAfter(": ")}
            .map { it.split("|") }
            .map { Pair(stringToInt(it[0]), stringToInt(it[1])) }
            .map { it.first.intersect(it.second) }
@@ -22,8 +23,21 @@ fun main() {
     }
 
     fun part2(input: List<String>): Int {
+        val cards = input
+            .map { it.substringAfter(": ")}
+            .map { it.split("|") }
+            .map { Pair(stringToInt(it[0]), stringToInt(it[1])) }
 
-        return 0
+        val counts = cards.map { 1 }.toMutableList()
+
+        cards.forEachIndexed { index, card ->
+            val score = card.first.intersect(card.second).count()
+            for (i in index + 1  ..< index + 1 + score) {
+                counts[i] += counts[index]
+            }
+        }
+
+        return counts.sum()
     }
 
     // test if implementation meets criteria from the description, like:
